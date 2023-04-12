@@ -40,45 +40,58 @@ def sigmoid(z):
     return a
 
 
-def autonomic_map(mtx):
+def autonomic_map(dict_list):
     out = []
-
+    mtx = [0, 0, 0, 0, 0, 0]
+    print_debug('--------------')
+    print_debug('Raw Sentiment Output')
+    print_debug('--------------')
+    print_debug(str(dict_list))
+    print_debug('--------------')
     print_debug('Sentiment Component Contributions')
-
+    print_debug('--------------')
     # Anger
     # anger = sigmoid(15 * mtx[0] - 10) + 0.2 * np.sin(math.pi*mtx[0])**2
+
+    # Anger
+    mtx[0] = [d['score'] for d in dict_list if d['label'] == 'anger'][0]
     anger = mtx[0]**3
     out.append(anger)
     print_debug(f'Anger: {np.round(anger, 3)}')
 
     # Disgust
+    mtx[1] = [d['score'] for d in dict_list if d['label'] == 'disgust'][0]
     disgust = mtx[1]
     out.append(disgust)
     print_debug(f'Disgust: {np.round(disgust, 3)}')
 
     # Fear
+    mtx[2] = [d['score'] for d in dict_list if d['label'] == 'fear'][0]
     fear = mtx[2]**2
     out.append(fear)
     print_debug(f'Fear: {np.round(fear, 3)}')
 
     # Joy
-    joy = 0.75*(mtx[5]+0.1)*np.cos(math.pi*mtx[5])**2
+    mtx[3] = [d['score'] for d in dict_list if d['label'] == 'joy'][0]
+    joy = 0.75*(mtx[3]+0.1)*np.cos(math.pi*mtx[3])**2
     out.append(joy)
     print_debug(f'Joy: {np.round(joy, 3)}')
 
     # Neutral is the 4th value
 
     # Sadness
-    sadness = 0.75*(mtx[5]+0.1)*np.cos(math.pi*mtx[5])**2
+    mtx[4] = [d['score'] for d in dict_list if d['label'] == 'sadness'][0]
+    sadness = 0.75*(mtx[4]+0.1)*np.cos(math.pi*mtx[4])**2
     out.append(sadness)
     print_debug(f'Sadness: {np.round(sadness, 3)}')
 
     # Surprise
-    surprise = mtx[6]
+    mtx[5] = [d['score'] for d in dict_list if d['label'] == 'surprise'][0]
+    surprise = mtx[5]
     out.append(surprise)
-    print_debug(f'Surprise: {np.round(fear, 3)}')
+    print_debug(f'Surprise: {np.round(surprise, 3)}')
 
-    out = anger + disgust + fear + joy + sadness + surprise
+    # out = anger + disgust + fear + joy + sadness + surprise
 
     # Normalize if desired
     final = np.sum(out)
@@ -90,6 +103,7 @@ def autonomic_map(mtx):
 
     print_debug('--------------')
     print_debug(f'Autonomic coefficient: {np.round(final, 2)}')
+    print_debug('--------------')
 
     return final
 
@@ -132,12 +146,8 @@ def which_params(toggle):
 
 def autonomic_update(text, buffer):
     emotions = classifier(text)[0]
-    emote_mtx = []
 
-    for emotion in emotions:
-        emote_mtx.append(emotion['score'])
-
-    parameter_map(autonomic_map(emote_mtx), buffer)
+    parameter_map(autonomic_map(emotions), buffer)
 
 '''
 def activate(x):
