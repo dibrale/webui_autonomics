@@ -23,5 +23,5 @@ The UI of this extension looks like this:
 
 
 - Sliders allow the user to tune parameter ranges within which the model operates. Parameters that can be presently adjusted: `temperature`, `typical_p`, `repetition_penalty`, `encoder_repetition_penalty` and `penalty_alpha`
-- Press the 'Autonomic Update' button prior to each output generation. The extension will then analyze the sentiment of the entire input and context, aggregate the scores and calculate a new set of parameters. These are written to one of two buffer presets in an alternating fashion. The extension then loads the preset it wrote to so the new parameters will be used in the next generation call from the UI.
+- Press the 'Autonomic Update' button prior to each output generation. The extension will then analyze the sentiment of the input textbox, aggregate the scores and calculate a new set of parameters. These are written to one of two buffer presets in an alternating fashion. The extension then loads the preset it wrote to so the new parameters will be used in the next generation call from the UI.
 - The 'Print debug information to console' checkbox will print the sentiment scores, processed contributions and the final 'Autonomic coefficient' to console. The autonomic coefficient ranges from 0 (least stimulating input) to 1 (most stimulating) input.
