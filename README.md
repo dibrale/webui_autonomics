@@ -19,7 +19,7 @@ The parameter ranges built into the model are calibrated for [LLaMA-13B](https:/
 
 The UI of this extension looks like this:
 
-![autonomic](https://user-images.githubusercontent.com/108030031/231602382-b77ce422-6703-4d15-b6d5-7d206d5154a6.png)
+![autonomic2](https://user-images.githubusercontent.com/108030031/232086809-57398b01-1412-4955-81f0-4adf21ba48c4.png)
 
 - Press the 'Autonomic Update' button prior to each output generation. The extension will then analyze the sentiment of the input textbox contents, aggregate the scores and calculate a new set of parameters. These are written to one of two buffer presets in an alternating fashion. The extension then loads the preset it wrote to so the new parameters will be used in the next generation call from the UI.
 - The 'Print debug information to console' checkbox will print the sentiment scores, processed contributions and the final 'Autonomic coefficient' to console. The autonomic coefficient ranges from 0 (least stimulating input) to 1 (most stimulating) input.
