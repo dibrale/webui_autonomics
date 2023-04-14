@@ -50,8 +50,8 @@ def autonomic_map(dict_list):
     print_d('--------------')
     print_d('Raw Sentiment Output')
     print_d('--------------')
-    for k, v in dict_list.items():
-        print_d(f"{k}: {v:.2f}")
+    for i, d in enumerate(dict_list):
+        print_d(f"{d['label']}: {d['score']}")
     print_d('--------------')
     print_d('Sentiment Component Contributions')
     print_d('--------------')
