@@ -13,15 +13,16 @@ The parameter ranges built into the model are calibrated for [LLaMA-13B](https:/
 1. Make a new directory under text-generation-webui/extensions (eg.: text-generation-webui/extensions/webui-autonomics).
 2. Copy *script.py* from this repository into the new directory.
 3. Start `server.py` with the `--extensions webui-autonomics` flag.
-4. The extension will download *DistilRoBERTa* to run it locally, and will then be ready for use.
+4. The extension will download *DistilRoBERTa* to run it locally, and will then be ready for use. It will proceed to create the text-generation-webui/parameter_ranges/ directory if it is not present, as well as the files Autonomic_Buffer_A.txt and Autonomic_Buffer_B.txt in the text-generation-webui/presets/ directory when it performs parameter updates.  
 
 ## Usage
 
 The UI of this extension looks like this:
 
-![autonomic](https://user-images.githubusercontent.com/108030031/231602382-b77ce422-6703-4d15-b6d5-7d206d5154a6.png)
+![autonomic2](https://user-images.githubusercontent.com/108030031/232086809-57398b01-1412-4955-81f0-4adf21ba48c4.png)
 
-
-- Sliders allow the user to tune parameter ranges within which the model operates. Parameters that can be presently adjusted: `temperature`, `typical_p`, `repetition_penalty`, `encoder_repetition_penalty` and `penalty_alpha`
-- Press the 'Autonomic Update' button prior to each output generation. The extension will then analyze the sentiment of the input textbox, aggregate the scores and calculate a new set of parameters. These are written to one of two buffer presets in an alternating fashion. The extension then loads the preset it wrote to so the new parameters will be used in the next generation call from the UI.
+- Press the 'Autonomic Update' button prior to each output generation. The extension will then analyze the sentiment of the input textbox contents, aggregate the scores and calculate a new set of parameters. These are written to one of two buffer presets in an alternating fashion. The extension then loads the preset it wrote to so the new parameters will be used in the next generation call from the UI.
 - The 'Print debug information to console' checkbox will print the sentiment scores, processed contributions and the final 'Autonomic coefficient' to console. The autonomic coefficient ranges from 0 (least stimulating input) to 1 (most stimulating) input.
+- Sliders allow the user to tune parameter ranges within which the model operates. Parameters that can be presently adjusted: `temperature`, `typical_p`, `repetition_penalty`, `encoder_repetition_penalty`, `penalty_alpha` and `top_k`
+- Parameter ranges along with the 'Print debug information to console' state can be loaded from a dropdown menu below the 'Parameter Ranges' slider group. These are read from the text-generation-webui/parameter_ranges/ directory.
+- Parameter ranges can be saved by entering a name for the range in the 'Parameter range name' textbox, then clicking the 'Save' button. A *.json file with the new name as a root will be created in the text-generation-webui/parameter_ranges/ directory. The state of the 'Print debug information to console' toggle is also stored in this file.
