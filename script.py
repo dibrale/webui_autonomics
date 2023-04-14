@@ -124,7 +124,7 @@ def parameter_map(bias, toggle):
                   range_bias([params['repetition_penalty_lo'], params['repetition_penalty_hi']], bias),
                   range_bias([params['encoder_repetition_penalty_lo'], params['encoder_repetition_penalty_hi']], bias),
                   range_bias([params['penalty_alpha_lo'], params['penalty_alpha_hi']], bias),
-                  range_bias([params['top_k_lo'], params['top_k_hi']], bias),
+                  range_bias([int(params['top_k_lo']), int(params['top_k_hi'])], bias),
                   ]
 
     if toggle == 0:
@@ -138,7 +138,7 @@ def parameter_map(bias, toggle):
         print(f'repetition_penalty={params_new[2]}\n', file=text_file)
         print(f'encoder_repetition_penalty={params_new[3]}\n', file=text_file)
         print(f'penalty_alpha={params_new[4]}\n', file=text_file)
-        print(f'top_k={params_new[5]}\n', file=text_file)
+        print(f'top_k={int(params_new[5])}\n', file=text_file)
 
 
 def which_params(toggle):
@@ -256,9 +256,9 @@ def ui():
                                                           value=params['penalty_alpha_hi'],
                                                           elem_id='penalty_alpha_hi')
         with gr.Row():
-            shared.gradio['top_k_lo'] = gr.Slider(label='top_k (min arousal)', minimum=0, maximum=75, step=0.05,
+            shared.gradio['top_k_lo'] = gr.Slider(label='top_k (min arousal)', minimum=0, maximum=75, step=1,
                                                   value=params['top_k_lo'], elem_id='top_k_lo')
-            shared.gradio['top_k_hi'] = gr.Slider(label='top_k (max arousal)', minimum=0, maximum=75, step=0.05,
+            shared.gradio['top_k_hi'] = gr.Slider(label='top_k (max arousal)', minimum=0, maximum=75, step=1,
                                                   value=params['top_k_hi'], elem_id='top_k_hi')
     with gr.Row():
         select_range = gr.Dropdown(label='Load a saved parameter range', choices=list_files('param_ranges'),
