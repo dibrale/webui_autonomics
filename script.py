@@ -297,29 +297,29 @@ def ui():
 
     select_range.select(lambda x: load_params(x), select_range, save_txt) \
         .then(lambda x: gr.update(value=x), select_range, save_txt) \
-        .then(lambda x: gr.update(value=params['temp_lo']), None, shared.gradio['temp_lo']) \
-        .then(lambda x: gr.update(value=params['temp_hi']), None, shared.gradio['temp_hi']) \
-        .then(lambda x: gr.update(value=params['typical_p_lo']), None, shared.gradio['typical_p_lo']) \
-        .then(lambda x: gr.update(value=params['typical_p_hi']), None, shared.gradio['typical_p_hi']) \
-        .then(lambda x: gr.update(value=params['repetition_penalty_lo']), None, shared.gradio['repetition_penalty_lo']) \
-        .then(lambda x: gr.update(value=params['repetition_penalty_hi']), None, shared.gradio['repetition_penalty_hi']) \
-        .then(lambda x: gr.update(value=params['encoder_repetition_penalty_lo']), None, shared.gradio['encoder_repetition_penalty_lo']) \
-        .then(lambda x: gr.update(value=params['encoder_repetition_penalty_hi']), None, shared.gradio['encoder_repetition_penalty_hi']) \
-        .then(lambda x: gr.update(value=params['penalty_alpha_lo']), None, shared.gradio['penalty_alpha_lo']) \
-        .then(lambda x: gr.update(value=params['penalty_alpha_hi']), None, shared.gradio['penalty_alpha_hi']) \
-        .then(lambda x: gr.update(value=params['top_k_lo']), None, shared.gradio['top_k_lo']) \
-        .then(lambda x: gr.update(value=params['top_k_hi']), None, shared.gradio['top_k_hi'])
-    save_btn.click(lambda x: save_params(x), save_txt, None) \
+        .then(lambda x: gr.update(value=params['temp_lo']), select_range, shared.gradio['temp_lo']) \
+        .then(lambda x: gr.update(value=params['temp_hi']), select_range, shared.gradio['temp_hi']) \
+        .then(lambda x: gr.update(value=params['typical_p_lo']), select_range, shared.gradio['typical_p_lo']) \
+        .then(lambda x: gr.update(value=params['typical_p_hi']), select_range, shared.gradio['typical_p_hi']) \
+        .then(lambda x: gr.update(value=params['repetition_penalty_lo']), select_range, shared.gradio['repetition_penalty_lo']) \
+        .then(lambda x: gr.update(value=params['repetition_penalty_hi']), select_range, shared.gradio['repetition_penalty_hi']) \
+        .then(lambda x: gr.update(value=params['encoder_repetition_penalty_lo']), select_range, shared.gradio['encoder_repetition_penalty_lo']) \
+        .then(lambda x: gr.update(value=params['encoder_repetition_penalty_hi']), select_range, shared.gradio['encoder_repetition_penalty_hi']) \
+        .then(lambda x: gr.update(value=params['penalty_alpha_lo']), select_range, shared.gradio['penalty_alpha_lo']) \
+        .then(lambda x: gr.update(value=params['penalty_alpha_hi']), select_range, shared.gradio['penalty_alpha_hi']) \
+        .then(lambda x: gr.update(value=params['top_k_lo']), select_range, shared.gradio['top_k_lo']) \
+        .then(lambda x: gr.update(value=params['top_k_hi']), select_range, shared.gradio['top_k_hi'])
+    save_btn.click(lambda x: save_params(x), save_txt, select_range) \
         .then(update_dropdown, save_txt, select_range) \
-        .then(lambda x: gr.update(value=params['temp_lo']), None, shared.gradio['temp_lo']) \
-        .then(lambda x: gr.update(value=params['temp_hi']), None, shared.gradio['temp_hi']) \
-        .then(lambda x: gr.update(value=params['typical_p_lo']), None, shared.gradio['typical_p_lo']) \
-        .then(lambda x: gr.update(value=params['typical_p_hi']), None, shared.gradio['typical_p_hi']) \
-        .then(lambda x: gr.update(value=params['repetition_penalty_lo']), None, shared.gradio['repetition_penalty_lo']) \
-        .then(lambda x: gr.update(value=params['repetition_penalty_hi']), None, shared.gradio['repetition_penalty_hi']) \
-        .then(lambda x: gr.update(value=params['encoder_repetition_penalty_lo']), None, shared.gradio['encoder_repetition_penalty_lo']) \
-        .then(lambda x: gr.update(value=params['encoder_repetition_penalty_hi']), None, shared.gradio['encoder_repetition_penalty_hi']) \
-        .then(lambda x: gr.update(value=params['penalty_alpha_lo']), None, shared.gradio['penalty_alpha_lo']) \
-        .then(lambda x: gr.update(value=params['penalty_alpha_hi']), None, shared.gradio['penalty_alpha_hi']) \
-        .then(lambda x: gr.update(value=params['top_k_lo']), None, shared.gradio['top_k_lo']) \
-        .then(lambda x: gr.update(value=params['top_k_hi']), None, shared.gradio['top_k_hi'])
+        .then(lambda x: gr.update(value=params['temp_lo']), select_range, shared.gradio['temp_lo']) \
+        .then(lambda x: gr.update(value=params['temp_hi']), select_range, shared.gradio['temp_hi']) \
+        .then(lambda x: gr.update(value=params['typical_p_lo']), select_range, shared.gradio['typical_p_lo']) \
+        .then(lambda x: gr.update(value=params['typical_p_hi']), select_range, shared.gradio['typical_p_hi']) \
+        .then(lambda x: gr.update(value=params['repetition_penalty_lo']), select_range, shared.gradio['repetition_penalty_lo']) \
+        .then(lambda x: gr.update(value=params['repetition_penalty_hi']), select_range, shared.gradio['repetition_penalty_hi']) \
+        .then(lambda x: gr.update(value=params['encoder_repetition_penalty_lo']), select_range, shared.gradio['encoder_repetition_penalty_lo']) \
+        .then(lambda x: gr.update(value=params['encoder_repetition_penalty_hi']), select_range, shared.gradio['encoder_repetition_penalty_hi']) \
+        .then(lambda x: gr.update(value=params['penalty_alpha_lo']), select_range, shared.gradio['penalty_alpha_lo']) \
+        .then(lambda x: gr.update(value=params['penalty_alpha_hi']), select_range, shared.gradio['penalty_alpha_hi']) \
+        .then(lambda x: gr.update(value=params['top_k_lo']), select_range, shared.gradio['top_k_lo']) \
+        .then(lambda x: gr.update(value=params['top_k_hi']), select_range, shared.gradio['top_k_hi'])
