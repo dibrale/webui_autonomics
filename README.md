@@ -10,9 +10,9 @@ The parameter ranges built into the model are calibrated for [LLaMA-13B](https:/
 
 ## Installation
 
-1. Make a new directory under text-generation-webui/extensions (eg.: text-generation-webui/extensions/webui-autonomics).
+1. Make a new directory under text-generation-webui/extensions (eg.: text-generation-webui/extensions/autonomics).
 2. Copy *script.py* from this repository into the new directory.
-3. Start `server.py` with the `--extensions webui-autonomics` flag.
+3. Start `server.py` with the `--extensions autonomics` flag.
 4. The extension will download *DistilRoBERTa* to run it locally, and will then be ready for use. It will proceed to create the text-generation-webui/parameter_ranges/ directory if it is not present, as well as the files Autonomic_Buffer_A.txt and Autonomic_Buffer_B.txt in the text-generation-webui/presets/ directory when it performs parameter updates.  
 
 ## Usage
