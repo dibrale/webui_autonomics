@@ -112,7 +112,7 @@ def make_parameters(bias, toggle):
 
     # TODO: Make this procedural
     params_new = {
-        'temperature': float(range_bias([params['temp_lo'], params['temp_hi']], bias)),
+        'temp': float(range_bias([params['temp_lo'], params['temp_hi']], bias)),
         'typical_p': float(range_bias([params['typical_p_lo'], params['typical_p_hi']], bias)),
         'repetition_penalty': float(range_bias([params['repetition_penalty_lo'], params['repetition_penalty_hi']], bias)),
         'encoder_repetition_penalty': float(range_bias([params['encoder_repetition_penalty_lo'], params['encoder_repetition_penalty_hi']], bias)),
