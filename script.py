@@ -21,17 +21,44 @@ params = {
     'repetition_penalty_lo': 1.15,
     'repetition_penalty_hi': 1.1,
     'encoder_repetition_penalty_lo': 1.05,
-    'encoder_repetition_penalty_hi': 1,
+    'encoder_repetition_penalty_hi': float(1),
     'penalty_alpha_lo': 2.5,
-    'penalty_alpha_hi': 1,
-    'top_k_lo': 4,
-    'top_k_hi': 10,
+    'penalty_alpha_hi': float(1),
+    'top_k_lo': int(4),
+    'top_k_hi': int(10),
 }
 
 
 def print_d(text):
     if params['print_debug']:
         print('[Autonomic System Extension] ' + text)
+
+
+def save_params(filename):
+    with open(f'param_ranges/{filename}.yaml', 'w') as f:
+        yaml.dump(params, f)
+        print_d('--------------')
+        print_d(f'Parameter ranges saved to \'param_ranges/{filename}.yaml\':')
+        print_d('--------------')
+        for k, v in params.items():
+            print_d(f"{k}: {v:.2f}")
+
+
+def load_params(filename):
+    with open(f'param_ranges/{filename}.yaml') as f:
+        params.update(yaml.safe_load(f))
+        print_d('--------------')
+        print_d(f'Parameter ranges after loading \'param_ranges/{filename}.yaml\':')
+        print_d('--------------')
+        for k, v in params.items():
+            print_d(f"{k}: {v:.2f}")
+        return filename
+
+
+if not isdir('param_ranges'):
+    makedirs('param_ranges')
+if not isfile('param_ranges/Default.yaml'):
+    save_params('Default')
 
 
 def autonomic_map(dict_list):
@@ -146,26 +173,6 @@ def autonomic_update(text, buffer):
     make_parameters(autonomic_map(emotions), buffer)
 
 
-def save_params(filename):
-    with open(f'param_ranges/{filename}.yaml', 'w') as f:
-        yaml.dump(params, f)
-        print_d('--------------')
-        print_d(f'Parameter ranges saved to \'param_ranges/{filename}.yaml\':')
-        print_d('--------------')
-        for k, v in params.items():
-            print_d(f"{k}: {v:.2f}")
-
-
-def load_params(filename):
-    with open(f'param_ranges/{filename}.yaml') as f:
-        params.update(yaml.safe_load(f))
-        print_d('--------------')
-        print_d(f'Parameter ranges after loading \'param_ranges/{filename}.yaml\':')
-        print_d('--------------')
-        for k, v in params.items():
-            print_d(f"{k}: {v:.2f}")
-
-
 def list_files(path):
     if not isdir(path):
         makedirs(path)
@@ -198,14 +205,20 @@ def ui():
         if not label:
             label = shared_id
 
-        if params[lo] and type(params[lo]) is (float or int):
+        if params[lo] and type(params[lo]) is float or type(params[lo]) is int:
             value_lo = params[lo]
         else:
+            print_d(f"No default value for {lo} was found")
+            if params[lo]:
+                print_d(f"Type is {type(params[lo])}, value is {params[lo]}")
             value_lo = 0
 
-        if params[hi] and type(params[hi]) is (float or int):
+        if params[hi] and type(params[hi]) is float or type(params[hi]) is int:
             value_hi = params[hi]
         else:
+            print_d(f"No default value for {hi} was found")
+            if params[hi]:
+                print_d(f"Type is {type(params[hi])}, value is {params[hi]}")
             value_hi = 0
 
         with gr.Row():
@@ -232,7 +245,7 @@ def ui():
         select_range = gr.Dropdown(label='Load a saved parameter range', choices=list_files('param_ranges'),
                                    value='Select range to load', interactive=True)
     with gr.Row():
-        save_text = gr.Textbox(label='Parameter range name')
+        save_text = gr.Textbox(value='Default', label='Parameter range name')
         save_btn = gr.Button(value='Save')
 
     def autonomic_change_method(shared_id: str):
@@ -254,16 +267,33 @@ def ui():
     autonomic_change_method('penalty_alpha')
     autonomic_change_method('top_k')
 
-    def autonomic_event_update():
-        for name in list(params.keys()):
-            (gr.update(value=params[name]), select_range, shared.gradio[name])
+    def autonomic_event_update(*args):
+        output = []
+        key_list = list(params.keys())
+        counter = -1
+
+        for value in args:
+            counter += 1
+            try:
+                element = shared.gradio[key_list[counter]]
+            except KeyError as e:
+                print(e)
+                output.append(value)
+                continue
+            try:
+                output.append(element.update(value=params[key_list[counter]]))
+                print_d(f"Loading {key_list[counter]} value: {params[key_list[counter]]}")
+            except AttributeError as e:
+                print(e)
+                output.append(element)
+
+        return output
 
     select_range.select(lambda x: load_params(x), select_range, save_text).then(
-        lambda x: gr.update(value=x), select_range, save_text).then(
-        lambda x: autonomic_event_update(), select_range, save_text
+        autonomic_event_update,
+        [shared.gradio[key] for key in params.keys()],
+        [shared.gradio[key] for key in params.keys()]
     )
 
     save_btn.click(lambda x: save_params(x), save_text, select_range).then(
-        update_dropdown, save_text, select_range).then(
-        lambda x: autonomic_event_update(), save_text, select_range
-    )
+        update_dropdown, save_text, select_range)
