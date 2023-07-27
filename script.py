@@ -12,25 +12,95 @@ from transformers import pipeline
 classifier = pipeline("text-classification", model="j-hartmann/emotion-english-distilroberta-base",
                       top_k=None, device="cpu")
 
+internal_params = {
+    'print_debug': True
+}
+
 params = {
-    'print_debug': True,
-    'temp_lo': 0.4,
-    'temp_hi': 1.1,
+    'temperature_lo': 0.4,
+    'temperature_hi': 1.1,
     'typical_p_lo': 0.8,
     'typical_p_hi': 0.2,
+    'top_p_lo': float(1),
+    'top_p_hi': float(1),
+    'epsilon_cutoff_lo': float(0),
+    'epsilon_cutoff_hi': float(0),
+    'eta_cutoff_lo': float(0),
+    'eta_cutoff_hi': float(0),
     'repetition_penalty_lo': 1.15,
     'repetition_penalty_hi': 1.1,
+    'repetition_penalty_range_lo': int(0),
+    'repetition_penalty_range_hi': int(0),
     'encoder_repetition_penalty_lo': 1.05,
     'encoder_repetition_penalty_hi': float(1),
     'penalty_alpha_lo': 2.5,
     'penalty_alpha_hi': float(1),
     'top_k_lo': int(4),
     'top_k_hi': int(10),
+    'do_sample': True,
+    'no_repeat_ngram_size_lo': int(0),
+    'no_repeat_ngram_size_hi': int(0),
+    'min_length_lo': int(0),
+    'min_length_hi': int(0),
+    'tfs_lo': float(1),
+    'tfs_hi': float(1),
+    'top_a_lo': float(0),
+    'top_a_hi': float(0),
+    'max_new_tokens_lo': int(200),
+    'max_new_tokens_hi': int(200),
+    'generation_attempts_lo': int(1),
+    'generation_attempts_hi': int(1),
+    'num_beams_lo': int(1),
+    'num_beams_hi': int(1),
+    'length_penalty_lo': float(1),
+    'length_penalty_hi': float(1),
+    'early_stopping': False,
+    'mirostat_mode_lo': int(0),
+    'mirostat_mode_hi': int(0),
+    'mirostat_tau_lo': int(5),
+    'mirostat_tau_hi': int(5),
+    'mirostat_eta_lo': 0.1,
+    'mirostat_eta_hi': 0.1,
 }
+
+numerical_param_list = [
+    'temperature',
+    'top_p',
+    'typical_p',
+    'top_k',
+    'epsilon_cutoff',
+    'eta_cutoff',
+    'repetition_penalty',
+    'repetition_penalty_range',
+    'encoder_repetition_penalty',
+    'penalty_alpha',
+    'no_repeat_ngram_size',
+    'min_length',
+    'tfs',
+    'top_a',
+    'max_new_tokens',
+    'generation_attempts',
+    'num_beams',
+    'length_penalty',
+    'mirostat_mode',
+    'mirostat_tau',
+    'mirostat_eta'
+]
+
+int_param_list = [
+    'repetition_penalty_range',
+    'top_k',
+    'no_repeat_ngram_size',
+    'min_length',
+    'max_new_tokens',
+    'generation_attempts',
+    'num_beams',
+    'mirostat_mode',
+]
 
 
 def print_d(text):
-    if params['print_debug']:
+    if internal_params['print_debug']:
         print('[Autonomic System Extension] ' + text)
 
 
@@ -135,17 +205,23 @@ def range_bias(val: list[float | int, float | int], bias: float) -> float:
     return out
 
 
-def make_parameters(bias, toggle):
+def make_param(key: str, bias: float, make_int=False) -> dict:
+    value = float(range_bias([params[key + '_lo'], params[key + '_hi']], bias))
+    if make_int:
+        value = int(value)
+    return {key: value}
 
-    # TODO: Make this procedural
-    params_new = {
-        'temperature': float(range_bias([params['temp_lo'], params['temp_hi']], bias)),
-        'typical_p': float(range_bias([params['typical_p_lo'], params['typical_p_hi']], bias)),
-        'repetition_penalty': float(range_bias([params['repetition_penalty_lo'], params['repetition_penalty_hi']], bias)),
-        'encoder_repetition_penalty': float(range_bias([params['encoder_repetition_penalty_lo'], params['encoder_repetition_penalty_hi']], bias)),
-        'penalty_alpha': float(range_bias([params['penalty_alpha_lo'], params['penalty_alpha_hi']], bias)),
-        'top_k': int(range_bias([int(params['top_k_lo']), int(params['top_k_hi'])], bias))
-    }
+
+def make_parameters(bias, toggle):
+    params_new = {}
+    for param in numerical_param_list:
+        if param in int_param_list:
+            is_int = True
+        else:
+            is_int = False
+        params_new.update(make_param(param, bias, is_int))
+    params_new.update({'do_sample': params['do_sample']})
+    params_new.update({'early_stopping': params['early_stopping']})
 
     if toggle == 0:
         file_name = "Autonomic_Buffer_A"
@@ -205,7 +281,7 @@ def ui():
         if not label:
             label = shared_id
 
-        if params[lo] and type(params[lo]) is float or type(params[lo]) is int:
+        if (params[lo] or params[lo] == 0) and (type(params[lo]) is float or type(params[lo]) is int):
             value_lo = params[lo]
         else:
             print_d(f"No default value for {lo} was found")
@@ -213,7 +289,7 @@ def ui():
                 print_d(f"Type is {type(params[lo])}, value is {params[lo]}")
             value_lo = 0
 
-        if params[hi] and type(params[hi]) is float or type(params[hi]) is int:
+        if (params[hi] or params[hi] == 0) and (type(params[hi]) is float or type(params[hi]) is int):
             value_hi = params[hi]
         else:
             print_d(f"No default value for {hi} was found")
@@ -223,23 +299,41 @@ def ui():
 
         with gr.Row():
             shared.gradio[lo] = gr.Slider(
-                label=f"{label} ({lo_desc})", minimum=minimum, maximum=maximum, step=step, value=value_lo, elem_id=lo)
+                label=f"{label} ({lo_desc})", minimum=minimum, maximum=maximum, step=step, value=value_lo, elem_id=lo, interactive=True)
             shared.gradio[hi] = gr.Slider(
-                label=f"{label} ({hi_desc})", minimum=minimum, maximum=maximum, step=step, value=value_hi, elem_id=hi)
+                label=f"{label} ({hi_desc})", minimum=minimum, maximum=maximum, step=step, value=value_hi, elem_id=hi, interactive=True)
 
     with gr.Row():
         button_a = gr.Button(value='Autonomic Update', elem_id='load_autonomic')
         shared.gradio['print_debug'] = gr.Checkbox(
-            value=params['print_debug'], label='Print debug information to console')
+            value=internal_params['print_debug'], label='Print debug information to console')
         buffer_switch = gr.Number(interactive=False, visible=False)
 
     with gr.Accordion(label='Parameter Ranges', open=False):
-        autonomic_range_slider_row('temp', minimum=0.05, maximum=2)
-        autonomic_range_slider_row('typical_p')
-        autonomic_range_slider_row('repetition_penalty', maximum=2)
-        autonomic_range_slider_row('encoder_repetition_penalty', maximum=2)
-        autonomic_range_slider_row('penalty_alpha', maximum=5)
+        autonomic_range_slider_row('temperature', minimum=0.05, maximum=2)
+        autonomic_range_slider_row('top_p')
         autonomic_range_slider_row('top_k', maximum=75, step=1)
+        autonomic_range_slider_row('typical_p')
+        autonomic_range_slider_row('epsilon_cutoff', maximum=9, step=0.1)
+        autonomic_range_slider_row('eta_cutoff', maximum=20, step=0.1)
+        autonomic_range_slider_row('top_k', maximum=75, step=1)
+        autonomic_range_slider_row('repetition_penalty', maximum=2)
+        autonomic_range_slider_row('repetition_penalty_range', maximum=4096, step=1)
+        autonomic_range_slider_row('encoder_repetition_penalty', maximum=2)
+        autonomic_range_slider_row('no_repeat_ngram_size', maximum=20, step=1)
+        autonomic_range_slider_row('min_length', maximum=2000, step=1)
+        autonomic_range_slider_row('tfs')
+        autonomic_range_slider_row('top_a')
+        shared.gradio['do_sample'] = gr.Checkbox(label='do_sample', value=params['do_sample'])
+        autonomic_range_slider_row('max_new_tokens', maximum=4096, step=1)
+        autonomic_range_slider_row('generation_attempts', maximum=10, step=1)
+        autonomic_range_slider_row('penalty_alpha', maximum=5)
+        autonomic_range_slider_row('num_beams', maximum=20, step=1)
+        autonomic_range_slider_row('length_penalty', minimum=-5, maximum=5, step=0.1)
+        shared.gradio['early_stopping'] = gr.Checkbox(label='early_stopping', value=params['early_stopping'])
+        autonomic_range_slider_row('mirostat_mode', maximum=2, step=1)
+        autonomic_range_slider_row('mirostat_tau', minimum=0, maximum=10, step=0.1)
+        autonomic_range_slider_row('mirostat_eta')
 
     with gr.Row():
         select_range = gr.Dropdown(label='Load a saved parameter range', choices=list_files('param_ranges'),
@@ -256,16 +350,18 @@ def ui():
     def update_dropdown(v):
         return gr.Dropdown.update(choices=list_files('param_ranges'), value=v)
 
-    shared.gradio['print_debug'].change(lambda x: params.update({"print_debug": x}), shared.gradio['print_debug'], None)
+    shared.gradio['print_debug'].change(lambda x: internal_params.update({"print_debug": x}),
+                                        shared.gradio['print_debug'], None)
     button_a.click(autonomic_update, [shared.gradio['textbox'], buffer_switch]) \
         .then(which_params, buffer_switch, [shared.gradio['preset_menu'], buffer_switch])
 
-    autonomic_change_method('temp')
-    autonomic_change_method('typical_p')
-    autonomic_change_method('repetition_penalty')
-    autonomic_change_method('encoder_repetition_penalty')
-    autonomic_change_method('penalty_alpha')
-    autonomic_change_method('top_k')
+    for param in numerical_param_list:
+        autonomic_change_method(param)
+
+    shared.gradio['do_sample'].change(lambda x: params.update({'do_sample': x}),
+                                      shared.gradio['do_sample'], None)
+    shared.gradio['early_stopping'].change(lambda x: params.update({'early_stopping': x}),
+                                           shared.gradio['early_stopping'], None)
 
     def autonomic_event_update(*args):
         output = []
